@@ -1,0 +1,18 @@
+﻿  Building Custom Rule E:/Cases/SchedulerModuleDemo/CMakeLists.txt
+  Main.cpp
+E:\Cases\SchedulerModuleDemo\source\core/Scheduler.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+E:\Cases\SchedulerModuleDemo\source\core/System.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+E:\Cases\SchedulerModuleDemo\source\core/System.h(37,5): warning C4309: “初始化”: 截断常量值
+E:\Cases\SchedulerModuleDemo\source\core/System.h(37,26): warning C4369: “cc::Priority::SCHEDULER”: 枚举数的值“-2147483648”不能表示为“unsigned int”，值是“2147483648”
+  Tests.cpp
+E:\Cases\SchedulerModuleDemo\source\core/Scheduler.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+E:\Cases\SchedulerModuleDemo\source\core/System.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+E:\Cases\SchedulerModuleDemo\source\core/System.h(37,5): warning C4309: “初始化”: 截断常量值
+E:\Cases\SchedulerModuleDemo\source\core/System.h(37,26): warning C4369: “cc::Priority::SCHEDULER”: 枚举数的值“-2147483648”不能表示为“unsigned int”，值是“2147483648”
+  Scheduler.cpp
+E:\Cases\SchedulerModuleDemo\source\core/Scheduler.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+E:\Cases\SchedulerModuleDemo\source\core/System.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+E:\Cases\SchedulerModuleDemo\source\core/System.h(37,5): warning C4309: “初始化”: 截断常量值
+E:\Cases\SchedulerModuleDemo\source\core/System.h(37,26): warning C4369: “cc::Priority::SCHEDULER”: 枚举数的值“-2147483648”不能表示为“unsigned int”，值是“2147483648”
+  正在生成代码...
+  ScheduleDemo.vcxproj -> E:\Cases\SchedulerModuleDemo\out\Win32\Release\ScheduleDemo.exe
