@@ -1,2 +1,2 @@
-cmake -B"out/Win32"\
-    -A"Win32"
+cmake -B"out/X64"\
+    -A"x64"
