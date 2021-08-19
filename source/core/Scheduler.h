@@ -43,15 +43,14 @@ public:
     /** set interval in seconds */
     inline void setInterval(float interval) { _interval = interval; };
 
-    void setupTimerWithInterval(float interval, uint32_t repeat, float delay);
+    virtual void setupTimerWithInterval(float interval, uint32_t repeat, float delay) = 0;
 
     virtual void trigger(float dt) = 0;
     virtual void cancel()          = 0;
 
     /** triggers the timer */
     void update(float dt);
-
-protected:
+//protected dtor? Need to consider how to release space
     Timer() = default;
     virtual ~Timer() = default; 
 protected:
@@ -68,7 +67,7 @@ protected:
 class CC_DLL TimerTargetCallback final : public Timer {
 public:
     TimerTargetCallback() = default;
-
+    void setupTimerWithInterval(float interval, uint32_t repeat, float delay) override;
     // Initializes a timer with a target, a lambda and an interval in seconds, repeat in number of times to repeat, delay in seconds.
     bool initWithCallback(Scheduler* scheduler, const ccSchedulerFunc& callback, ISchedulable* target, const std::string& key, float seconds, uint32_t repeat, float delay);
 
@@ -100,11 +99,13 @@ public:
     bool          _paused{false};
     bool          _markedForDeletion{false};
 
-    static ListEntry* get(ISchedulable* target, Priority priority, bool paused, bool markedForDeletion);
-    static void       put(ListEntry* entry);
+    static ListEntry* getFromPool(ISchedulable* target, Priority priority, bool paused, bool markedForDeletion);
+    static void       pushToPool(ListEntry* entry);
+    ~ListEntry();
+protected:
     ListEntry() {}
     ListEntry(ISchedulable* target, Priority priority, bool paused, bool markedForDeletion);
-    ~ListEntry();
+   
 
     
 private:
@@ -127,13 +128,14 @@ public:
     ISchedulable*   _target{nullptr};
     ccSchedulerFunc _callback{nullptr};
 
-    static HashUpdateEntry* get(std::vector<HashUpdateEntry*>& list, ListEntry* entry, ISchedulable* target, ccSchedulerFunc* callback);
-    static void             put(HashUpdateEntry* entry);
-
+    static HashUpdateEntry* getFromPool(void* list, ListEntry* entry, ISchedulable* target, ccSchedulerFunc& callback);
+    static void             pushToPool(HashUpdateEntry* entry);
+    ~HashUpdateEntry();
+protected:
     HashUpdateEntry() {}
     HashUpdateEntry(void* list, ListEntry* entry, ISchedulable* target, ccSchedulerFunc& callback);
-    ~HashUpdateEntry();
-
+   
+    void release();
 private:
     static std::vector<HashUpdateEntry*> _hashUpdateEntries;
 };
@@ -158,9 +160,14 @@ public:
     bool                _currentTimerSalvaged{false};
     bool                _paused{false};
 
-    static HashTimerEntry* get(std::vector<Timer*>& timers, ISchedulable* target, uint32_t timerIndex, Timer* currentTimer, bool currentTimerSalvaged, bool paused);
-    static void            put(HashTimerEntry* entry);
-
+    static HashTimerEntry* getFromPool(std::vector<Timer*>& timers, ISchedulable* target, uint32_t timerIndex, Timer* currentTimer, bool currentTimerSalvaged, bool paused);
+    static void            pushToPool(HashTimerEntry* entry);
+    ~HashTimerEntry();
+protected:
+    HashTimerEntry() {}
+    HashTimerEntry(std::vector<Timer*>& timers, ISchedulable* target, uint32_t timerIndex, Timer* currentTimer, bool currentTimerSalvaged, bool paused);
+    
+    void release();
 private:
     static std::vector<HashTimerEntry*> _hashTimerEntries;
 };

@@ -9,6 +9,7 @@ int main()
 {
 	std::cout << "Compile succeed, Test start" << std::endl;
 	/********************* Test 000 : pointers and examples **************************/
+	tt::Test000_addressOfVector();
 	cc::ccSchedulerFunc nptr{ nullptr };
 	std::cout << &nptr << std::endl;
 	nptr = callbackFunctionDemo;
@@ -17,12 +18,14 @@ int main()
 	
 	std::string* s{ nullptr };
 	s = new std::string("Hellow");
-	delete s;
 	s = nullptr;
 	
 
 	/********************* Test 001 :  ListEntry Basic Function and default constructor **********************/
 	tt::Test001();
+	/********************* Test 002 :  ListEntry Basic Function and default constructor **********************/
+	
+
 	return 0;
 }
 

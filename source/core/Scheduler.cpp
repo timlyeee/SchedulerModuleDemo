@@ -113,7 +113,6 @@ namespace cc {
     /***** List Entry *****/
     std::vector<ListEntry*> ListEntry::_listEntries = std::vector<ListEntry*>();
 
-    ListEntry::ListEntry(){}
     ListEntry::ListEntry(ISchedulable* target, 
         Priority priority, 
         bool paused, 
@@ -126,7 +125,7 @@ namespace cc {
         delete _target;
     }
     
-    ListEntry* ListEntry::get(ISchedulable* target, 
+    ListEntry* ListEntry::getFromPool(ISchedulable* target,
         Priority priority, 
         bool paused, 
         bool markedForDeletion) {
@@ -145,7 +144,7 @@ namespace cc {
             return result;
         }
     }
-    void ListEntry::put(ListEntry* entry) {
+    void ListEntry::pushToPool(ListEntry* entry) {
         if (_listEntries.size() < MAX_POOL_SIZE) {
             delete entry->_target;
             entry->_target = nullptr;
@@ -166,6 +165,89 @@ namespace cc {
         _target(target),
         _callback(callback){}
 
+    HashUpdateEntry::~HashUpdateEntry() {
+        release();
+    }
+    HashUpdateEntry* HashUpdateEntry::getFromPool(void* list,
+        ListEntry* entry,
+        ISchedulable* target,
+        ccSchedulerFunc& callback) {
+        if (!_hashUpdateEntries.empty()) {
+            HashUpdateEntry* result = _hashUpdateEntries.back();
+            _hashUpdateEntries.pop_back();
+            result->release();
+            result->_list = list;
+            result->_entry = entry;
+            result->_target = target;
+            result->_callback = callback;
+            return result;
+        } else {
+            return new HashUpdateEntry(list, entry, target, callback);
+        }
+        
+    }
+    void HashUpdateEntry::pushToPool(HashUpdateEntry* entry) {
+        if (_hashUpdateEntries.size() < MAX_POOL_SIZE) {
+            entry->release();
+            entry->_callback = nullptr;
+            _hashUpdateEntries.push_back(entry);
+        }
+    }
+    void HashUpdateEntry::release() {
+        delete _list, _entry, _target;
+    }
+    /**** HashTimerEntry ****/
+    std::vector<HashTimerEntry *> HashTimerEntry::_hashTimerEntries = std::vector<HashTimerEntry *>();
+    HashTimerEntry::HashTimerEntry(std::vector<Timer*>& timers,
+        ISchedulable* target,
+        uint32_t timerIndex,
+        Timer* currentTimer,
+        bool currentTimerSalvaged,
+        bool paused) :
+        _target(target),
+        _currentTimer(currentTimer),
+        _timerIndex(timerIndex),
+        _currentTimerSalvaged(currentTimerSalvaged),
+        _paused(paused),
+        _timers(timers){}
+    HashTimerEntry::~HashTimerEntry() {
+        release();
+    }
+    void HashTimerEntry::release() {
+
+        _currentTimer = nullptr;// _currentTimer get from _timers logically, so it would be released with _timers
+        delete _target;
+        for (Timer* t : _timers)
+        {
+            delete t;
+        }
+        _timers.clear();
+        
+    }
+    HashTimerEntry* HashTimerEntry::getFromPool(std::vector<Timer*>& timers,
+        ISchedulable* target, 
+        uint32_t timerIndex, 
+        Timer* currentTimer, 
+        bool currentTimerSalvaged, 
+        bool paused) {
+        if (!_hashTimerEntries.empty()) {
+            //get from vector pool
+            auto result = _hashTimerEntries.back();
+            _hashTimerEntries.pop_back();
+            result->release();
+            result->_timers = timers;
+            result->_currentTimer = currentTimer;
+            result->_timerIndex = timerIndex;
+            result->_currentTimerSalvaged = currentTimerSalvaged;
+            result->_paused = paused;
+            return result;
+        } else { 
+            return new HashTimerEntry();
+        }
+    }
+    void HashTimerEntry::pushToPool(HashTimerEntry* entry) {
+        _hashTimerEntries.push_back(entry);
+    }
     /***** Scheduler *****/
 
 
